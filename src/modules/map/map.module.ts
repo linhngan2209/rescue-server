@@ -6,6 +6,6 @@ import { DangerZone } from 'src/entities/danger_zone.entity';
 @Module({
   imports: [TypeOrmModule.forFeature([DangerZone])],
   providers: [MapService],
-  exports: [MapService], 
+  exports: [MapService],
 })
-export class MapModule {}
+export class MapModule { }

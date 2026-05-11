@@ -5,12 +5,6 @@ import { TrackingService } from './tracking.service';
 export class TrackingController {
   constructor(private readonly trackingService: TrackingService) { }
 
-  /**
-   * GET /tracking/states
-   * Snapshot trạng thái live tất cả thiết bị.
-   * Dashboard gọi lần đầu khi load để khởi tạo bản đồ,
-   * sau đó dùng Socket.IO để cập nhật real-time.
-   */
   @Get('states')
   async getStates() {
     return this.trackingService.getAllStates();

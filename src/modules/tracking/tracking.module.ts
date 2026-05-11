@@ -16,8 +16,6 @@ import { AlgorithmsModule } from '../algorithms/algorithms.module';
 import { SignalMonitorService } from './signal_monitor.service';
 import { AlertsModule } from '../alerts/alerts.module';
 import { TasksModule } from '../task/tasks.module';
-import { MqttConnectionService } from '../mqtt/mqtt-connection.service';
-import { MqttModule } from '../mqtt/mqtt.module';
 
 @Module({
   imports: [

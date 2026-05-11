@@ -30,7 +30,6 @@ export class AlertsService {
       .getMany();
   }
 
-  /** Lấy alert chưa resolve */
   async findUnresolved(): Promise<Alert[]> {
     return this.alertRepo.find({
       where: { resolved: false },
@@ -52,11 +51,11 @@ export class AlertsService {
     deviceId: string;
     zoneId?: number;
     type: AlertType;
-  
+
   }): Promise<Alert> {
     const alert = this.alertRepo.create({
       deviceId: data.deviceId,
-      zoneId: data.zoneId, 
+      zoneId: data.zoneId,
       type: data.type,
       resolved: false,
     });
@@ -64,7 +63,6 @@ export class AlertsService {
     return await this.alertRepo.save(alert);
   }
 
-  /** Đánh dấu đã xử lý — dashboard gọi khi nhấn "Resolve" */
   async resolve(id: number): Promise<Alert> {
     const alert = await this.alertRepo.findOne({ where: { id } });
     if (!alert) throw new NotFoundException(`Alert ${id} not found`);
@@ -72,7 +70,6 @@ export class AlertsService {
     return this.alertRepo.save(alert);
   }
 
-  /** Resolve tất cả alert của 1 device (khi thiết bị ra khỏi vùng nguy hiểm) */
   async resolveByDevice(deviceId: string): Promise<void> {
     await this.alertRepo.update(
       { deviceId, resolved: false },

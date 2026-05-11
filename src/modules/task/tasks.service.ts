@@ -1,4 +1,3 @@
-// src/tasks/tasks.service.ts
 
 import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,14 +6,7 @@ import { DeviceTask, TaskStatus } from 'src/entities/device_task.entity';
 import { Incident, IncidentStatus } from 'src/entities/incident.entity';
 import { EventsGateway } from 'src/events/events.gateway';
 import { WS_TOPIC, WS_MESSAGE } from 'src/events/events.constants';
-
-export interface ActiveUnitTask {
-    entityId: string;
-    originLat: number;
-    originLng: number;
-    destLat: number;
-    destLng: number;
-}
+import { ActiveUnitTask } from './tasks.types';
 
 @Injectable()
 export class TasksService {
@@ -27,7 +19,6 @@ export class TasksService {
 
         private readonly gateway: EventsGateway,
     ) { }
-
 
     async assign(deviceId: string, incidentId: number): Promise<DeviceTask> {
         const incident = await this.incidentRepo.findOne({ where: { id: incidentId } });

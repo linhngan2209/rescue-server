@@ -6,11 +6,11 @@ import { RoutingController } from './routing.controller';
 
 @Module({
   imports: [
-    ZonesModule, 
+    ZonesModule,
     EventsModule,
   ],
   providers: [RoutingService],
   controllers: [RoutingController],
   exports: [RoutingService],
 })
-export class RoutingModule {}
+export class RoutingModule { }

@@ -3,8 +3,9 @@ import {
   Delete,
 } from '@nestjs/common';
 import {
-  EntitiesService, CreateDeviceDto, UpdateDeviceDto,
+  EntitiesService,
 } from './devices.service';
+import { CreateDeviceDto, UpdateDeviceDto } from './devices.types';
 
 @Controller('devices')
 export class EntitiesController {

@@ -4,18 +4,9 @@ import { Repository } from 'typeorm';
 import { TrackingService } from '../tracking/tracking.service';
 import { DangerZone, LatLng } from 'src/entities/danger_zone.entity';
 import { Alert } from 'src/entities/alert.entity';
+import { CreateZoneDto, UpdateZoneDto } from './zone.types';
 
-export interface CreateZoneDto {
-  name: string;
-  coords: LatLng[];
-  createdBy?: string;
-}
 
-export interface UpdateZoneDto {
-  name?: string;
-  coords?: LatLng[];
-  active?: boolean;
-}
 
 @Injectable()
 export class ZonesService {
@@ -27,7 +18,7 @@ export class ZonesService {
     private readonly alertRepo: Repository<Alert>,
 
     private readonly trackingService: TrackingService,
-  ) {}
+  ) { }
 
   async findAll(): Promise<DangerZone[]> {
     return this.zoneRepo.find({ order: { createdAt: 'DESC' } });
@@ -77,10 +68,6 @@ export class ZonesService {
     await this.syncZones();
   }
 
-  /**
-   * Sau mỗi thay đổi zone:
-   * → chỉ reload cache tracking
-   */
   private async syncZones(): Promise<void> {
     await this.trackingService.reloadZones();
   }

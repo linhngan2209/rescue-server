@@ -45,10 +45,6 @@ export class AlgorithmsService {
     return inside;
   }
 
-  /**
-   * Nearest rescue — tìm thực thể an toàn gần nhất với vị trí đang nguy hiểm.
-   * Trả về null nếu không còn thực thể an toàn nào.
-   */
   findNearestRescue(
     dangerLat: number,
     dangerLng: number,

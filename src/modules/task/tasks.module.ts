@@ -1,4 +1,3 @@
-// src/tasks/tasks.module.ts
 
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -13,8 +12,8 @@ import { EventsModule } from 'src/events/events.module';
     TypeOrmModule.forFeature([DeviceTask, Incident]),
     EventsModule,
   ],
-  providers:   [TasksService],
+  providers: [TasksService],
   controllers: [TasksController],
-  exports:     [TasksService],   // export để TrackingService + RoutingService dùng
+  exports: [TasksService],
 })
-export class TasksModule {}
+export class TasksModule { }

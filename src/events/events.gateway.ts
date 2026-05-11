@@ -1,4 +1,3 @@
-// src/events/events.gateway.ts
 import { WebSocketGateway, WebSocketServer } from '@nestjs/websockets';
 import { Server } from 'socket.io';
 

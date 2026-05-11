@@ -5,21 +5,8 @@ import { Device, DeviceType } from 'src/entities/device.entity';
 import { PositionLog } from 'src/entities/position_log.entity';
 import { DeviceStatus } from 'src/entities/device_status.entity';
 import { Alert } from 'src/entities/alert.entity';
+import { CreateDeviceDto, UpdateDeviceDto } from './devices.types';
 
-export interface CreateDeviceDto {
-    id: string;
-    type: DeviceType;
-    description?: string;
-    step?: number;
-    intervalS?: number;
-}
-
-export interface UpdateDeviceDto {
-    description?: string;
-    step?: number;
-    intervalS?: number;
-    active?: boolean;
-}
 
 @Injectable()
 export class EntitiesService {

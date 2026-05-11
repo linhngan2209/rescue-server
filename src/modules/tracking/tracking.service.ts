@@ -3,8 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { InjectRedis } from '@nestjs-modules/ioredis';
 import Redis from 'ioredis';
-
-// tọa độ trung tâm
 import { IncidentsService } from '../incidents/incidents.service';
 import { PositionLog } from 'src/entities/position_log.entity';
 import { DangerZone } from 'src/entities/danger_zone.entity';
@@ -15,10 +13,9 @@ import { DeviceStatus } from 'src/entities/device_status.entity';
 import { EventsGateway } from 'src/events/events.gateway';
 import { EntitiesService } from '../devices/devices.service';
 import { AlgorithmsService } from '../algorithms/algorithms.service';
-import { ActiveUnit } from '../routing/routing.service';
-import { DeviceTask } from 'src/entities/device_task.entity';
 import { TasksService } from '../task/tasks.service';
 import { EventEmitter2 } from '@nestjs/event-emitter';
+import { DeviceState, RawGpsDto } from './tracking.types';
 
 const MIN_DIST_KM = 0.03;
 
@@ -28,25 +25,6 @@ const REDIS_KEY = {
 } as const;
 
 const REDIS_TTL = { state: 300, zones: 3600 } as const;
-
-
-
-export interface RawGpsDto {
-  deviceId: string;
-  lat: number;
-  lng: number;
-  speed: number;
-  status?: string;
-  battery?: number;
-  timestamp: Date;
-}
-
-export interface DeviceState {
-  id: string;
-  lat: number;
-  lng: number;
-  inDanger: boolean;
-}
 
 @Injectable()
 export class TrackingService implements OnModuleInit {
@@ -68,7 +46,6 @@ export class TrackingService implements OnModuleInit {
 
     @InjectRepository(DeviceStatus)
     private readonly statusRepo: Repository<DeviceStatus>,
-
 
     private readonly algorithms: AlgorithmsService,
     private readonly gateway: EventsGateway,

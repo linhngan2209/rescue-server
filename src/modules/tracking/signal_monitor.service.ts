@@ -20,7 +20,7 @@ export class SignalMonitorService {
     private readonly statusRepo: Repository<DeviceStatus>,
     private readonly alertsService: AlertsService,
     private readonly gateway: EventsGateway,
-  ) {}
+  ) { }
 
   @Interval(10_000)
   async checkSignals(): Promise<void> {
@@ -56,7 +56,7 @@ export class SignalMonitorService {
         await this.alertsService.createAlert({
           deviceId: s.deviceId,
           type: AlertType.SIGNAL_RECOVERED,
-      
+
         });
         this.gateway.sendNotification(WS_TOPIC.SIGNAL, WS_MESSAGE.SIGNAL_RECOVERED, {
           deviceId: s.deviceId,

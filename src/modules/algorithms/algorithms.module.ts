@@ -1,4 +1,3 @@
-// algorithms.module.ts
 import { Module } from '@nestjs/common';
 import { AlgorithmsService } from './algorithms.service';
 

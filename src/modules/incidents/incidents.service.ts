@@ -1,42 +1,18 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Not, Repository } from 'typeorm';
-
 import { Incident, IncidentSource, IncidentStatus, IncidentType } from 'src/entities/incident.entity';
 import { AlgorithmsService } from '../algorithms/algorithms.service';
+import { CreateFromMqttDto } from './incidents.types';
 
-// ── DTOs ──────────────────────────────────────────────────────────────────────
-
-export interface CreateIncidentDto {
-  name?: string;
-  lat: number;
-  lng: number;
-  type: IncidentType;
-  source: IncidentSource;
-  reportedBy?: string;
-  description?: string;
-}
-
-export interface CreateFromMqttDto {
-  deviceId: string;   // "UAV_01" | "RES_01" | "AMB_01"
-  incidentType: string;   // "incident" | "rescue"
-  lat: number;
-  lng: number;
-  desc: string;
-}
-
-// ── Service ───────────────────────────────────────────────────────────────────
 
 @Injectable()
 export class IncidentsService {
   constructor(
     @InjectRepository(Incident)
     private readonly repo: Repository<Incident>,
-
     private readonly algorithms: AlgorithmsService,
   ) { }
-
-  // ── Query ─────────────────────────────────────────────────────────────────
 
   findAll() {
     return this.repo.find({
@@ -54,13 +30,7 @@ export class IncidentsService {
 
   async getCommandCenter(): Promise<{ name: string; lat: number; lng: number }> {
     const center = await this.repo.findOneBy({ type: IncidentType.CENTER });
-    if (!center) {
-      return {
-        name: 'Trung tâm chỉ huy',
-        lat: 21.5948,
-        lng: 105.8406,
-      };
-    }
+    if (!center) return { name: 'Trung tâm chỉ huy', lat: 21.5948, lng: 105.8406 };
     return center;
   }
 
@@ -70,7 +40,6 @@ export class IncidentsService {
       order: { createdAt: 'DESC' },
     });
   }
-
 
   create(dto: any): Promise<Incident> {
     return this.repo.save({
@@ -85,47 +54,31 @@ export class IncidentsService {
     });
   }
 
-  /**
-   * Tạo incident từ MQTT payload.
-   * Source tự xác định từ prefix deviceId:
-   *   UAV_* → IncidentSource.UAV
-   *   RES_* / AMB_* / ... → IncidentSource.ENTITY
-   */
   createFromMqtt(dto: CreateFromMqttDto): Promise<Incident> {
-    const source = dto.deviceId.startsWith('UAV')
-      ? IncidentSource.UAV
-      : IncidentSource.ENTITY;
-
-    const typeLabel = dto.incidentType === 'rescue'
-      ? 'Điểm cứu hộ'
-      : 'Điểm sự cố';
+    const source = dto.deviceId.startsWith('UAV') ? IncidentSource.UAV : IncidentSource.ENTITY;
+    const isRescue = dto.incidentType === 'rescue';
 
     return this.create({
-      name: `${typeLabel} [${dto.deviceId}]`,
+      name: `${isRescue ? 'Điểm cứu hộ' : 'Điểm sự cố'} [${dto.deviceId}]`,
       lat: dto.lat,
       lng: dto.lng,
-      type: dto.incidentType === 'rescue'
-        ? IncidentType.RESCUE
-        : IncidentType.INCIDENT,
+      type: isRescue ? IncidentType.RESCUE : IncidentType.INCIDENT,
       source,
       reportedBy: dto.deviceId,
       description: dto.desc,
     });
   }
 
-  /** @deprecated dùng createFromMqtt thay thế */
+  /** @deprecated */
   createFromUav(deviceId: string, lat: number, lng: number, desc: string): Promise<Incident> {
     return this.createFromMqtt({ deviceId, incidentType: 'incident', lat, lng, desc });
   }
 
-  /** @deprecated dùng createFromMqtt thay thế */
+  /** @deprecated */
   createFromEntity(deviceId: string, lat: number, lng: number): Promise<Incident> {
     return this.createFromMqtt({ deviceId, incidentType: 'rescue', lat, lng, desc: '' });
   }
 
-  /**
-   * Người chỉ huy đặt thủ công trên dashboard.
-   */
   async createManual(dto: any): Promise<Incident> {
     return this.repo.manager.transaction(async (manager) => {
       const repo = manager.getRepository(Incident);
@@ -133,22 +86,15 @@ export class IncidentsService {
       if (dto.type === IncidentType.CENTER) {
         await manager.query(`SELECT pg_advisory_xact_lock(1001)`);
         const existing = await repo.findOneBy({ type: IncidentType.CENTER });
-        if (existing) {
-          return repo.save({ ...existing, ...dto });
-        }
+        if (existing) return repo.save({ ...existing, ...dto });
       }
 
       return repo.save({ ...dto, source: IncidentSource.MANUAL });
     });
   }
 
-  // ── Update ────────────────────────────────────────────────────────────────
-
   async resolve(id: number): Promise<Incident | null> {
-    await this.repo.update(id, {
-      status: IncidentStatus.RESOLVED,
-      resolvedAt: new Date(),
-    });
+    await this.repo.update(id, { status: IncidentStatus.RESOLVED, resolvedAt: new Date() });
     return this.repo.findOne({ where: { id } });
   }
 
@@ -157,8 +103,6 @@ export class IncidentsService {
     if (!incident) throw new Error(`Incident ${id} not found`);
     await this.repo.delete({ id });
   }
-
-  // ── Nearest rescue ────────────────────────────────────────────────────────
 
   async findNearestRescue(lat: number, lng: number) {
     const rescuePoints = await this.findByType(IncidentType.RESCUE);

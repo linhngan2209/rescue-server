@@ -12,7 +12,7 @@ export class MapService {
       SELECT name FROM rescue.danger_zones 
       WHERE ST_Contains(boundary, ST_SetSRID(ST_Point($1, $2), 4326))
     `;
-    const result = await this.repo.query(query, [lng, lat]); // PostGIS: (lng, lat)
+    const result = await this.repo.query(query, [lng, lat]); 
     return result.length > 0 ? result[0].name : null;
   }
 }
