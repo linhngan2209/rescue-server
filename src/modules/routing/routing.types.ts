@@ -20,7 +20,7 @@ export interface RerouteSuggestion {
 }
 
 export interface AddDangerZoneResult {
-    zoneId: number;
+    zoneId: number | null;
     blockedEdges: number;
     suggestions: RerouteSuggestion[];
 }

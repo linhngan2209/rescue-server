@@ -251,20 +251,15 @@ export class RoutingService implements OnModuleInit {
     lng: number,
     incidentName: string,
     units: ActiveUnit[],
-    radiusM = 200,
+    radiusM = 100,
   ): Promise<AddDangerZoneResult> {
-    const saved = await this.zonesService.create({
-      name: incidentName,
-      coords: makeSquarePolygon(lat, lng, radiusM),
-      createdBy: 'uav',
-    });
-
+  
     const [blockedEdges, suggestions] = await Promise.all([
       this.applyDangerZones(),
-      this.scanAndSuggestReroutes(units, lat, lng, saved.name),
+      this.scanAndSuggestReroutes(units, lat, lng, incidentName),
     ]);
 
-    return { zoneId: saved.id, blockedEdges, suggestions };
+    return { zoneId: null, blockedEdges, suggestions };
   }
 
   async approveReroute(entityId: string): Promise<void> {

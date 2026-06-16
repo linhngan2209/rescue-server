@@ -41,8 +41,9 @@ export class IncidentsService {
     });
   }
 
-  create(dto: any): Promise<Incident> {
-    return this.repo.save({
+  async create(dto: any): Promise<Incident> {
+
+    const incident = await this.repo.save({
       name: dto.name ?? `Incident @ ${dto.lat},${dto.lng}`,
       lat: dto.lat,
       lng: dto.lng,
@@ -52,13 +53,19 @@ export class IncidentsService {
       description: dto.description ?? null,
       status: IncidentStatus.ACTIVE,
     });
+
+    return incident;
   }
 
-  createFromMqtt(dto: CreateFromMqttDto): Promise<Incident> {
-    const source = dto.deviceId.startsWith('UAV') ? IncidentSource.UAV : IncidentSource.ENTITY;
+  async createFromMqtt(dto: CreateFromMqttDto): Promise<Incident> {
+   
+    const source = dto.deviceId.startsWith('UAV')
+      ? IncidentSource.UAV
+      : IncidentSource.ENTITY;
+
     const isRescue = dto.incidentType === 'rescue';
 
-    return this.create({
+    const incident = await this.create({
       name: `${isRescue ? 'Điểm cứu hộ' : 'Điểm sự cố'} [${dto.deviceId}]`,
       lat: dto.lat,
       lng: dto.lng,
@@ -67,6 +74,9 @@ export class IncidentsService {
       reportedBy: dto.deviceId,
       description: dto.desc,
     });
+
+
+    return incident;
   }
 
   /** @deprecated */

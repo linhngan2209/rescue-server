@@ -8,7 +8,7 @@ import { EventsGateway } from 'src/events/events.gateway';
 import { WS_TOPIC, WS_MESSAGE } from 'src/events/events.constants';
 import { AlertType } from 'src/entities/alert.entity';
 
-const LOST_THRESHOLD_MS = 30_000;
+const LOST_THRESHOLD_MS = 15_000;
 
 @Injectable()
 export class SignalMonitorService {
@@ -22,7 +22,7 @@ export class SignalMonitorService {
     private readonly gateway: EventsGateway,
   ) { }
 
-  @Interval(10_000)
+  @Interval(5_000)
   async checkSignals(): Promise<void> {
     const statuses = await this.statusRepo.find();
     const now = Date.now();

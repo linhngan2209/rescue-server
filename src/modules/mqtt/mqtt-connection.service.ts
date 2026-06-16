@@ -4,32 +4,35 @@ import * as mqtt from 'mqtt';
 @Injectable()
 export class MqttConnectionService {
   private readonly logger = new Logger(MqttConnectionService.name);
-  private client: mqtt.MqttClient;
-  private messageHandler: (topic: string, message: Buffer) => void;
+  private client!: mqtt.MqttClient;
+  private messageHandler?: (topic: string, message: Buffer) => void;
 
-  async connect(brokerUrl = 'mqtts://broker.hivemq.com:8883'): Promise<void> {
+  async connect(brokerUrl = 'mqtt://broker.hivemq.com:1883'): Promise<void> {
     this.client = mqtt.connect(brokerUrl, {
-      clean:              true,
-      connectTimeout:     4000,
-      reconnectPeriod:    1000,
+      clean: true,
+      connectTimeout: 4000,
+      reconnectPeriod: 1000,
       rejectUnauthorized: false,
     });
 
     this.client.on('connect', () => {
       this.logger.log('MQTT connected');
-      this.client.subscribe('rescue/devices/#', { qos: 1 });
-      this.client.subscribe('rescue/events/anomaly', { qos: 1 });
+
+      this.client.subscribe('rescue/devices/#', { qos: 1 }, (err, granted) => {
+        if (err) this.logger.error('Subscribe rescue/devices/# FAILED', err);
+      }); this.client.subscribe('rescue/events/anomaly', { qos: 1 });
       this.logger.log('Subscribed: rescue/devices/#');
       this.logger.log('Subscribed: rescue/events/anomaly');
     });
 
     this.client.on('message', (topic, message) => {
+
       this.messageHandler?.(topic, message);
     });
 
-    this.client.on('error',     (err) => this.logger.error('MQTT error', err));
-    this.client.on('reconnect', ()    => this.logger.warn('MQTT reconnecting...'));
-    this.client.on('offline',   ()    => this.logger.warn('MQTT offline'));
+    this.client.on('error', (err) => this.logger.error('MQTT error', err));
+    this.client.on('reconnect', () => this.logger.warn('MQTT reconnecting...'));
+    this.client.on('offline', () => this.logger.warn('MQTT offline'));
   }
 
 

@@ -30,7 +30,9 @@ export class MessageHandlersService {
       const data = JSON.parse(message.toString());
 
       if (topic.startsWith('rescue/devices/')) {
+
         const deviceId = topic.split('/')[2];
+
         if (!deviceId) return;
 
         const lat = data.lat ?? data.la;
@@ -78,7 +80,6 @@ export class MessageHandlersService {
           });
           return;
         }
-
         const [saved, alert] = await Promise.all([
           this.incidentsService.createFromMqtt({ deviceId, incidentType: type, lat, lng, desc }),
           this.alertsService.createAlert({ deviceId, type: alertType }),

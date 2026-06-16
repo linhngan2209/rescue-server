@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 @WebSocketGateway()
 export class EventsGateway {
   @WebSocketServer()
-  server: Server;
+  server!: Server;
 
   sendNotification(topic: number, messageType: number, data: any) {
     this.server.emit('notification', {
